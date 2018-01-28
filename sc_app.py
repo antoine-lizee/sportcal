@@ -1,6 +1,6 @@
 import json
 from pprint import pprint
-from time import sleep
+from time import sleep, time
 
 from dateutil import parser
 import requests
@@ -15,9 +15,11 @@ base_url = "https://api.sportradar.us/soccer-xt3/eu/en/%s.json?api_key={}".forma
 
 
 def request_sport_radar(string_identifier):
+    t0 = time()
     resp_txt = requests.get(base_url % string_identifier).text
     print(resp_txt[:100])
     resp_txt = resp_txt if resp_txt[0] == '{' else '{}'
+    sleep(1 - (time() - t0))
     return json.loads(resp_txt)
 
 # tournaments_data = json.loads(requests.get(base_url % "tournaments").text)
@@ -25,9 +27,7 @@ def request_sport_radar(string_identifier):
 # pprint([(t['name'], t['id']) for t in tournaments_data['tournaments']])
 
 uefa_cl_data = request_sport_radar("tournaments/sr:tournament:7/info")
-sleep(1)
 PL_data = request_sport_radar("tournaments/sr:tournament:17/info")
-sleep(1)
 L1_data = request_sport_radar("tournaments/sr:tournament:34/info")
 
 teams = uefa_cl_data['groups'][8]['teams'] + PL_data['groups'][0]['teams'] + L1_data['groups'][0]['teams']
@@ -54,7 +54,7 @@ def index():
             ]
             events.sort(key=lambda e: e['scheduled'])
             print("got event request")
-            pprint(events[10])
+            pprint(events[:10])
         if 'calendar' in request.form:
             print("got calendar request")
     print("DONE")
