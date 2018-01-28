@@ -12,6 +12,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/js/standalone/selectize.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.12.4/css/selectize.css" rel="stylesheet" />
 
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
   <style>
     :root {
       --jumbotron-padding-y: 3rem;
@@ -102,10 +105,10 @@
       <form method="POST">
         <div class="form-row">
           <div class="form-group col-md-9">
-            <select id="select-team" multiple="" name="selected_teams">
-              <option value="">Select One or more teams</option>
+            <select id="select-team" class="form-control" multiple="" name="selected_teams">
+              <!--<option value="">Select One or more teams</option>-->
               {% for team in teams %}
-              <option value="{{team.id}}">{{team.name}}</option>
+              <option value="{{team.id}}" {% if team.id in selected_team_values%} selected="selected" {% endif %}>{{team.name}}</option>
               {% endfor %}
             </select>
           </div>
@@ -117,7 +120,8 @@
         {% if selected_team_values %}
         <div class="form-row">
           <div class="form-group col-md-9">
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email address" name="email_address">
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+                   placeholder="Enter email address" name="email_address">
             <!--<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>-->
           </div>
           <div class="form-group col-md-3">
@@ -130,6 +134,7 @@
     </div>
   </section>
 
+  {% if events %}
   <div class="container">
     <div class="row">
       {% for event in events[:15]%}
@@ -146,6 +151,7 @@
       {% endfor %}
     </div>
   </div>
+  {% endif %}
 
 </main>
 
@@ -160,10 +166,13 @@
 </html>
 <script>
     $(document).ready(function() {
-        $('#select-team').selectize({
-            plugins: ['remove_button'],
-            items:{{selected_team_values|safe}},
-    });
+//        $('#select-team').selectize({
+//            plugins: ['remove_button'],
+//            items:{{selected_team_values|safe}},
+//    });
+        $('#select-team').select2({
+            placeholder: 'Select teams...',
+        });
         console.log("HERE WE GO!");
     });
 </script>

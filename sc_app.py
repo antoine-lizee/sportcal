@@ -21,6 +21,7 @@ def _jinja2_filter_datetime(date):
 def index():
     selected_team_values = []
     events = []
+    email_address = ""
     if request.method == 'POST':
         print(request.form)
         selected_team_values = request.form.getlist('selected_teams')
@@ -32,5 +33,12 @@ def index():
             events.sort(key=lambda e: e['scheduled'])
             print("got event request")
         if 'calendar' in request.form:
+            email_address = request.form['email_address']
             print("got calendar request")
-    return render_template("index.html", teams=teams, selected_team_values=selected_team_values, events=events)
+    return render_template(
+        "index.html",
+        teams=teams,
+        selected_team_values=selected_team_values,
+        events=events,
+        email_address=email_address,
+    )
