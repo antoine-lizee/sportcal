@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from dateutil import parser
+from dateutil.relativedelta import relativedelta
 from flask import Flask, render_template, request
 
 print("!! Initializing app.. !!")
@@ -26,15 +29,16 @@ def index():
         print(request.form)
         selected_team_values = request.form.getlist('selected_teams')
         if 'events' in request.form:
-            selected_teams = [t for t in teams if t['id'] in selected_team_values]
-            events = [
-                e for t in selected_team_values for e in request_sport_radar("teams/%s/schedule" % t).get('schedule', [])
-            ]
+            for team_id in selected_team_values:
+                for event in request_sport_radar("teams/%s/schedule" % team_id).get('schedule', []):
+                    scheduled_at = parser.parse(event['scheduled'])
+                    if scheduled_at > datetime.now(scheduled_at.tzinfo) - relativedelta(hours=3):
+                        events.append(event)
             events.sort(key=lambda e: e['scheduled'])
-            print("got event request")
+            print("Treated event request")
         if 'calendar' in request.form:
             email_address = request.form['email_address']
-            print("got calendar request")
+            print("Treated calendar request")
     return render_template(
         "index.html",
         teams=teams,
