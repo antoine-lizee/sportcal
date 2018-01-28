@@ -44,6 +44,7 @@ def _jinja2_filter_datetime(date, fmt=None):
 @app.route("/", methods=['GET', 'POST'])
 def index():
     selected_team_values = []
+    events = []
     if request.method == 'POST':
         print(request.form)
         selected_team_values = request.form.getlist('selected_teams')
