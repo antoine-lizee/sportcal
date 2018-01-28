@@ -7,6 +7,7 @@ from time import sleep, time
 import requests
 from dateutil.relativedelta import relativedelta
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import JSONB
 
 from sc_app import app
@@ -31,7 +32,6 @@ BASE_URL = "https://api.sportradar.us/soccer-xt3/eu/en/%s.json?api_key={}".forma
 
 
 def request_sport_radar(query_identifier):
-    t0 = time()
     existing_query_result = QueryResult.query.\
         filter(QueryResult.query_identifier == query_identifier).\
         order_by(QueryResult.created_at.desc()).\
@@ -40,6 +40,8 @@ def request_sport_radar(query_identifier):
         print("Loading result from request cache for:  '%s'" % query_identifier)
         result = existing_query_result.result
     else:
+        time_since_last_query = datetime.utcnow() - db.session.query(func.max(QueryResult.created_at)).scalar()
+        sleep(max(1 - time_since_last_query.total_seconds(), 0))
         resp_txt = requests.get(BASE_URL % query_identifier).text
         if resp_txt[0] != '{':
             print("Problem while querying from API for '%s'. Here is the result:\n%s" % (query_identifier, resp_txt[:100]))
@@ -49,7 +51,6 @@ def request_sport_radar(query_identifier):
         query_result = QueryResult(query_identifier=query_identifier, result=result)
         db.session.add(query_result)
         db.session.commit()
-        sleep(max(1 - (time() - t0), 0))
     return result
 
 
