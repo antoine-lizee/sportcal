@@ -135,7 +135,11 @@
       {% for event in events[:15]%}
       <ul class="col-md-10 offset-md-2">
         <li>
-            <p class="card-text"><strong>{{event.competitors[0].name}} vs {{event.competitors[1].name}}</strong> ({{event.tournament.name}}) - {{event.scheduled|strftime}} - {{event.venue.name}}, {{event.venue.city_name}}, {{event.venue.country_name}}</p>
+          <p class="card-text"><strong>{{event.competitors[0].name}} vs {{event.competitors[1].name}}</strong> ({{event.tournament.name}}) -
+            {{event.scheduled|strftime}}
+            {% if 'venue' in event %}
+            - {{event.venue.name}}, {{event.venue.city_name}}, {{event.venue.country_name}}</p>
+          {% endif %}
         </li>
       </ul>
       {% endfor %}
